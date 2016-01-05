@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+tmux_session=$1
+tmux has-session -t $tmux_session
+
+if [ $? != 0 ]
+then
+  if [ $tmux_session == 'aol' ]
+  then
+    # Create a work session
+    tmux new-session -s $tmux_session -n Applications -d
+
+    # Create vim and terminal windows
+    tmux split-window -h -t $tmux_session
+    tmux select-pane -t $tmux_session:0.0
+    tmux send-keys -t $tmux_session 'cd ~/Documents/projects/vagrant;vim' C-m
+    tmux select-pane -t $tmux_session:0.1
+    tmux send-keys -t $tmux_session 'cd ~/Documents/projects/vagrant' C-m
+    tmux send-keys -t $tmux_session 'vagrant up' C-m
+
+    tmux new-window -t $tmux_session -n SSH
+    tmux split-window -h -t $tmux_session
+    tmux select-pane -t $tmux_session:1.0
+    tmux send-keys -t $tmux_session 'cd ~/Documents/projects/vagrant; vagrant ssh' C-m
+    tmux select-pane -t $tmux_session:1.1
+    tmux send-keys -t $tmux_session 'cd ~/Documents/projects/vagrant; vagrant ssh' C-m
+
+  fi
+fi
+
+tmux attach -t $tmux_session
